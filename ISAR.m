@@ -116,6 +116,7 @@ HF = zeros(M,N);
 % MAIN LOOP
 %
 
+% POPULATE TRANSFER MATRIX
 for m = 1 : M
     for n = 1 : N
         HF(m,n) = sqrt(SIG) * (exp(1i*4*pi*f0(n)*R0/c0) + ...
@@ -127,25 +128,25 @@ for m = 1 : M
 end
 
 % PERFORM 2D FFTs
-HFFT2 = fftshift(fft(HF,N,1)/N);
-HFFT2 = fft(HFFT2,M,2)/M;
+HF = fftshift(fft(HF,N,1)/N);   % Column-Wise FFT
+HF = fft(HF,M,2)/M;             % Row-Wise FFT
 
 % CONVERT TO dBsm
-HFFT2 = 10*log10(abs(HFFT2));
+HF = 20*log10(abs(HF));         % 20 used because it is a voltage ratio
 
 % PLOT RESULTING IMAGE
-xa = [0 : N-1]*dRd; xa = xa - mean(xa);
-ya = [0 : M-1]*dRc; ya = ya - mean(ya);
-h = imagesc(xa/millimeters,ya/millimeters,HFFT2);
+xa = [0 : N-1]*dRd; xa = xa - mean(xa); % Generate x axis
+ya = [0 : M-1]*dRc; ya = ya - mean(ya); % Generate y axis
+h = imagesc(xa,ya,HF);
 h = get(h,'Parent');
 set(h,'FontSize',11,'YDir','normal');
 axis equal tight
 colormap('Jet');
 c = colorbar;
-caxis([-60 0]);
+caxis([-60 -10]);
 title('$\textrm{ISAR Image of a Drone}$','Interpreter','LaTex',...
     'FontSize',14);
-xlabel('$\textrm{x (mm)}$','Interpreter','LaTex','FontSize',12);
-ylabel('$\textrm{y (mm)}$','Interpreter','LaTex','FontSize',12,...
+xlabel('$\textrm{x (m)}$','Interpreter','LaTex','FontSize',12);
+ylabel('$\textrm{y (m)}$','Interpreter','LaTex','FontSize',12,...
     'Rotation',90);
 
