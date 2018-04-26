@@ -122,7 +122,6 @@ display('======================');
 
 for m = 1 : M
     for n = 1 : N
-        
         HF(m,n) = sqrt(SIG) * (exp(1i*4*pi*f0(n)*R0/c0) + ...
         exp((1i*4*pi*f0(n)*(R0 + r*cos((pi/4) + OMEGA*t(m,n))))/c0) + ...
         exp((1i*4*pi*f0(n)*(R0 + r*cos((3*pi/4) + OMEGA*t(m,n))))/c0) + ...
@@ -131,27 +130,26 @@ for m = 1 : M
     end
 end
 
-HFFT1 = (fft2(HF,M,N))/(N*M);
+% PERFORM 2D FFTs
+HFFT2 = fftshift(fft(HF,N,1)/N);
+HFFT2 = fft(HFFT2,M,2)/M;
 
-% for m = 1 : M
-%     for n = 1 : N
-%         HFFT2 = fft(HF(m,:),M);
-%         HFFT2 = fft(HF(:,n),N);
-%     end
-% end
+% CONVERT TO dBsm
+HFFT2 = 10*log10(abs(HFFT2));
 
-% for m = 1 : M
-%     HFFT2 = fft(HF(m,:),M);
-% end
-% 
-% for n = 1 : N
-%     HFFT2 = fft(HFFT2(:,n),N);
-% end
-
-HFFT1 = 20*log10(abs(HFFT1));
-
-imagesc((HFFT1))
+% PLOT RESULTING IMAGE
+xa = [0 : N-1]*dRd;
+ya = [0 : M-1]*dRc;
+h = imagesc(xa/millimeters,ya/millimeters,HFFT2);
+h = get(h,'Parent');
+set(h,'FontSize',11,'YDir','normal');
 axis equal tight
-colorbar;
-caxis([-60 -30]);
+colormap('Hot');
+c = colorbar;
+caxis([-60 0]);
+title('$\textrm{ISAR Image of a Drone}$','Interpreter','LaTex',...
+    'FontSize',14);
+xlabel('$\textrm{x (mm)}$','Interpreter','LaTex','FontSize',12);
+ylabel('$\textrm{y (mm)}$','Interpreter','LaTex','FontSize',12,...
+    'Rotation',90);
 
