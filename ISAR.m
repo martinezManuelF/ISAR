@@ -58,7 +58,7 @@ dRc = 20 * millimeters;  % Cross range resolution
 
 % TARGET CONSTRAINTS
 SIGdBsm = -10;
-r = 30 * millimeters;
+r = 170 * millimeters;
 
 % IMAGE CONSTRAINTS
 Sx = 640 * millimeters;
@@ -100,10 +100,58 @@ OMEGA = dTHETA/Tint;
 f0 = linspace(f1,fmax,N);
 
 % CREATE THE TIME ARRAY
-for n = 1 : N
-    for m = 1 : M
-        t(m,n) = (n-1)*T2 + (m-1)*(N-1)*T2
+for m = 1 : M
+    for n = 1 : N
+        t(m,n) = (n-1)*T2 + (m-1)*(N-1)*T2;
     end
 end
 
-%CHANGES
+% DETERMINE SIG IN LINEAR SCALE
+SIG = 10^(SIGdBsm/10) * (meters)^2;
+
+% INITIALIZE TRANSFER FUNCTION ARRAYS
+HF = zeros(M,N);
+
+%
+% MAIN LOOP
+%
+
+display('======================');
+display('Now Entering Main Loop');
+display('======================');
+
+for m = 1 : M
+    for n = 1 : N
+        
+        HF(m,n) = sqrt(SIG) * (exp(1i*4*pi*f0(n)*R0/c0) + ...
+        exp((1i*4*pi*f0(n)*(R0 + r*cos((pi/4) + OMEGA*t(m,n))))/c0) + ...
+        exp((1i*4*pi*f0(n)*(R0 + r*cos((3*pi/4) + OMEGA*t(m,n))))/c0) + ...
+        exp((1i*4*pi*f0(n)*(R0 + r*cos((5*pi/4) + OMEGA*t(m,n))))/c0) + ...
+        exp((1i*4*pi*f0(n)*(R0 + r*cos((7*pi/4) + OMEGA*t(m,n)))/c0)));
+    end
+end
+
+HFFT1 = (fft2(HF,M,N))/(N*M);
+
+% for m = 1 : M
+%     for n = 1 : N
+%         HFFT2 = fft(HF(m,:),M);
+%         HFFT2 = fft(HF(:,n),N);
+%     end
+% end
+
+% for m = 1 : M
+%     HFFT2 = fft(HF(m,:),M);
+% end
+% 
+% for n = 1 : N
+%     HFFT2 = fft(HFFT2(:,n),N);
+% end
+
+HFFT1 = 20*log10(abs(HFFT1));
+
+imagesc((HFFT1))
+axis equal tight
+colorbar;
+caxis([-60 -30]);
+
