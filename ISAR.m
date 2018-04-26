@@ -116,10 +116,6 @@ HF = zeros(M,N);
 % MAIN LOOP
 %
 
-display('======================');
-display('Now Entering Main Loop');
-display('======================');
-
 for m = 1 : M
     for n = 1 : N
         HF(m,n) = sqrt(SIG) * (exp(1i*4*pi*f0(n)*R0/c0) + ...
@@ -144,7 +140,7 @@ h = imagesc(xa/millimeters,ya/millimeters,HFFT2);
 h = get(h,'Parent');
 set(h,'FontSize',11,'YDir','normal');
 axis equal tight
-colormap('Hot');
+colormap('Jet');
 c = colorbar;
 caxis([-60 0]);
 title('$\textrm{ISAR Image of a Drone}$','Interpreter','LaTex',...
