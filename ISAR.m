@@ -134,8 +134,8 @@ HFFT2 = fft(HFFT2,M,2)/M;
 HFFT2 = 10*log10(abs(HFFT2));
 
 % PLOT RESULTING IMAGE
-xa = [0 : N-1]*dRd;
-ya = [0 : M-1]*dRc;
+xa = [0 : N-1]*dRd; xa = xa - mean(xa);
+ya = [0 : M-1]*dRc; ya = ya - mean(ya);
 h = imagesc(xa/millimeters,ya/millimeters,HFFT2);
 h = get(h,'Parent');
 set(h,'FontSize',11,'YDir','normal');
